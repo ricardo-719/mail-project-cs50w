@@ -31,3 +31,32 @@ function load_mailbox(mailbox) {
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 }
+
+// Compose email form and content variables
+
+const composeForm = document.getElementById('compose-form');
+const composeRecipients = document.getElementById('compose-recipients').value;
+const composeSubject = document.getElementById('compose-subject').value;
+const composeBody = documen.getElementById('compose-body').value;
+
+// Event handler for sending emails
+
+composeForm.addEventListener('submit', async () => {
+  try {
+    const response = await fetch('/emails', {
+      method: 'POST',
+      body: JSON.stringify({
+        recipients: composeRecipients, 
+        subject: composeSubject, 
+        body: composeBody
+      })
+    })
+    if(response.ok){
+      //const jsonResponse = await response.json();  UPDATE THIS TO COMMAND WHAT TO DO AFTER THE EMAIL HAS BEEN SENT!!!
+      console.log('EMAIL SENT SUCCESSFULLY')
+    }
+    throw new Error('Request failed!');
+  } catch (error) {
+    console.log(error)
+  }
+})
