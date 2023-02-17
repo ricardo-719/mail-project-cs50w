@@ -32,9 +32,9 @@ async function load_mailbox(mailbox) {
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
   // Request emails from server
-  const getInboxEmails = async () => {
+  const getEmails = async (mailbox) => {
     try {
-      const response = await fetch('emails/inbox');
+      const response = await fetch('emails/' + mailbox);
       const jsonResponse = await response.json();
       return jsonResponse
     } catch (error) {
@@ -43,11 +43,35 @@ async function load_mailbox(mailbox) {
   }
    
   // Populate inbox
-  const inboxEmails = await getInboxEmails();
-  console.log(inboxEmails)
-  for (let email in inboxEmails) {
-    console.log(inboxEmails[email].subject);
-    document.getElementById('emails-view').append(inboxEmails[email].subject);
+  const mailboxEmails = await getEmails(mailbox);
+  console.log(mailboxEmails)
+/*   mailboxEmails.forEach(email => {
+    p = document.createElement('p');
+    document.getElementById('emails-view').appendChild(p); 
+    att = document.createAttribute('class');
+    att.value = 'mailboxEmails';
+    p.setAttributeNode(att);
+    p.innerHTML = mailboxEmails[email].subject
+    
+  }); */
+
+  let emailIdCompiler = []
+
+  for (let email in mailboxEmails) {
+    console.log(mailboxEmails[email].subject);
+    document.getElementById('emails-view').innerHTML +=  `<div id=email${mailboxEmails[email].id} class='mailboxEmails'>
+    <span class="from">From: ${mailboxEmails[email].sender} </span> 
+    <span class="subject">Subject: ${mailboxEmails[email].subject}</span> 
+    <span class="timestamp">${mailboxEmails[email].timestamp}</span>
+    </div>`;
+    emailIdCompiler.push(mailboxEmails[email].id);
+  }
+
+  // Event handler for email clicks
+  for (let i = 0; i < emailIdCompiler.length; i++) {
+    document.getElementById(`email${emailIdCompiler[i]}`).addEventListener("click", () => {
+      console.log(`you just clicked on email${emailIdCompiler[i]} !!`);
+    });
   }
 }
 

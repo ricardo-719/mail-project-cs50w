@@ -1,3 +1,49 @@
+html {
+    font-size: 16px;
+}
+
 textarea {
     min-height: 400px;
+}
+
+/* #emails-view {
+    background-color: bisque;
+} */
+
+.mailboxEmails {
+    display: flex;
+    justify-content: space-between;
+    margin: 3px;
+    padding: 0;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.45);
+    text-align: center;
+    background-color: rgba(255, 228, 196, 0.45);
+    cursor: pointer;
+}
+
+.mailboxEmails:hover {
+    background-color: rgba(255, 228, 196, 0.8);
+    border: 1px solid rgba(128, 128, 128, 0.85);
+}
+
+.from{
+    display: inline-block;
+    max-width: 25rem;
+    margin-left: 2%;
+    font-weight: 500;
+}
+
+.subject {
+    display: inline-block;
+    max-width: 15rem;
+    font-weight: 500;
+}
+
+.timestamp {
+    display: inline-block;
+    max-width: 15rem;
+    margin-right: 2%;
+    color: gray;
+    font-style: italic;
+    font-size: 0.8rem;
 }
