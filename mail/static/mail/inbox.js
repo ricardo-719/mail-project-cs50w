@@ -32,16 +32,17 @@ function load_mailbox(mailbox) {
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 }
 
-// Compose email form and content variables
-
+// Compose email form
 const composeForm = document.getElementById('compose-form');
-const composeRecipients = document.getElementById('compose-recipients').value;
-const composeSubject = document.getElementById('compose-subject').value;
-const composeBody = documen.getElementById('compose-body').value;
 
 // Event handler for sending emails
-
-composeForm.addEventListener('submit', async () => {
+composeForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  
+  // Form content variables
+  const composeRecipients = document.getElementById('compose-recipients').value;
+  const composeSubject = document.getElementById('compose-subject').value;
+  const composeBody = document.getElementById('compose-body').value;
   try {
     const response = await fetch('/emails', {
       method: 'POST',
@@ -51,11 +52,10 @@ composeForm.addEventListener('submit', async () => {
         body: composeBody
       })
     })
-    if(response.ok){
-      //const jsonResponse = await response.json();  UPDATE THIS TO COMMAND WHAT TO DO AFTER THE EMAIL HAS BEEN SENT!!!
-      console.log('EMAIL SENT SUCCESSFULLY')
-    }
-    throw new Error('Request failed!');
+    const jsonResponse = await response.json();
+    console.log(jsonResponse);
+    load_mailbox('sent');
+    return;
   } catch (error) {
     console.log(error)
   }
