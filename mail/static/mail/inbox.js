@@ -22,7 +22,7 @@ function compose_email() {
   document.querySelector('#compose-body').value = '';
 }
 
-function load_mailbox(mailbox) {
+async function load_mailbox(mailbox) {
   
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
@@ -30,6 +30,25 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  // Request emails from server
+  const getInboxEmails = async () => {
+    try {
+      const response = await fetch('emails/inbox');
+      const jsonResponse = await response.json();
+      return jsonResponse
+    } catch (error) {
+      console.log(error);
+    }
+  }
+   
+  // Populate inbox
+  const inboxEmails = await getInboxEmails();
+  console.log(inboxEmails)
+  for (let email in inboxEmails) {
+    console.log(inboxEmails[email].subject);
+    document.getElementById('emails-view').append(inboxEmails[email].subject);
+  }
 }
 
 // Compose email form
