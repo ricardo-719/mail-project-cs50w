@@ -65,6 +65,9 @@ async function load_mailbox(mailbox) {
     <span class="timestamp">${mailboxEmails[email].timestamp}</span>
     </div>`;
     emailIdCompiler.push(mailboxEmails[email].id);
+    /* if (mailboxEmails[email].read) {
+      //TO ADD CLASS READ/UNREAD consider element.classList.add("my-class");
+    } */
   }
 
   // Event handler for email clicks
