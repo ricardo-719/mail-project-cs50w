@@ -56,6 +56,7 @@ async function load_mailbox(mailbox) {
   }); */
 
   let emailIdCompiler = []
+  let emailStatusCompiler = []
 
   for (let email in mailboxEmails) {
     console.log(mailboxEmails[email].subject);
@@ -65,9 +66,7 @@ async function load_mailbox(mailbox) {
     <span class="timestamp">${mailboxEmails[email].timestamp}</span>
     </div>`;
     emailIdCompiler.push(mailboxEmails[email].id);
-    /* if (mailboxEmails[email].read) {
-      //TO ADD CLASS READ/UNREAD consider element.classList.add("my-class");
-    } */
+    emailStatusCompiler.push(mailboxEmails[email].read)
   }
 
   // Event handler for email clicks
@@ -75,6 +74,9 @@ async function load_mailbox(mailbox) {
     document.getElementById(`email${emailIdCompiler[i]}`).addEventListener("click", () => {
       console.log(`you just clicked on email${emailIdCompiler[i]} !!`);
     });
+    if (emailStatusCompiler[i] === true) {
+      document.getElementById(`email${emailIdCompiler[i]}`).classList.add("readStatus");
+    }
   }
 }
 

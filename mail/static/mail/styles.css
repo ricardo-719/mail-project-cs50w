@@ -47,3 +47,13 @@ textarea {
     font-style: italic;
     font-size: 0.8rem;
 }
+
+.readStatus {
+    background-color: rgba(128, 128, 128, 0.3);
+    color: rgba(0, 0, 0, 0.8);
+    font-size: 0.95rem;
+}
+
+.readStatus:hover {
+    background-color: rgba(128, 128, 128, 0.5);
+}
