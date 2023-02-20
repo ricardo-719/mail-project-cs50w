@@ -22,6 +22,28 @@ function compose_email() {
   document.querySelector('#compose-body').value = '';
 }
 
+async function load_email(email) {
+
+  document.querySelector('#emails-view').innerHTML = `<h3>Email</h3>`;
+  
+  //Request email details
+  try {
+    const response = await fetch(`emails/${ email }`);
+    const emailDetail = await response.json();
+    console.log(emailDetail);
+    document.getElementById('emails-view').innerHTML +=  `<div id=readEmailInfo>
+    <p><b>From:</b> ${emailDetail.sender}</p>
+    <p><b>To:</b> ${emailDetail.recipients}</p>
+    <p><b>Subject:</b> ${emailDetail.subject}</p> 
+    <p><b>Timestamp:</b> ${emailDetail.timestamp}</p>
+    <hr>
+    <p> ${ emailDetail.body } </p>
+    </div>`;
+  }catch (error) {
+    console.log(error);
+  }
+}
+
 async function load_mailbox(mailbox) {
   
   // Show the mailbox and hide other views
@@ -73,6 +95,7 @@ async function load_mailbox(mailbox) {
   for (let i = 0; i < emailIdCompiler.length; i++) {
     document.getElementById(`email${emailIdCompiler[i]}`).addEventListener("click", () => {
       console.log(`you just clicked on email${emailIdCompiler[i]} !!`);
+      load_email(emailIdCompiler[i]);
     });
     if (emailStatusCompiler[i] === true) {
       document.getElementById(`email${emailIdCompiler[i]}`).classList.add("readStatus");

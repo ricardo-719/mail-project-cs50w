@@ -52,8 +52,13 @@ textarea {
     background-color: rgba(128, 128, 128, 0.3);
     color: rgba(0, 0, 0, 0.8);
     font-size: 0.95rem;
+    font-style: italic;
 }
 
 .readStatus:hover {
     background-color: rgba(128, 128, 128, 0.5);
+}
+
+#readEmailInfo {
+    line-height: 0.6rem;
 }
