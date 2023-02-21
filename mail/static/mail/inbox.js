@@ -10,6 +10,22 @@ document.addEventListener('DOMContentLoaded', function() {
   load_mailbox('inbox');
 });
 
+async function archiveEmail(email) {
+  document.getElementById(`email${email}`).parentElement.setAttribute('hidden', 'hidden')
+  try {
+    const response = await fetch(`emails/${ email }`, {
+      method: 'PUT',
+      body: JSON.stringify ({
+      archived: true
+      })
+    })
+    console.log(response);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
 function compose_email() {
 
   // Show compose view and hide other views
@@ -100,11 +116,12 @@ async function load_mailbox(mailbox) {
 
   for (let email in mailboxEmails) {
     console.log(mailboxEmails[email].subject);
+    console.log(mailboxEmails[email].archived)
     document.getElementById('emails-view').innerHTML +=  `<div class=emailContainer><span id="email${mailboxEmails[email].id}" class='mailboxEmails'>
     <span class="from">From: ${mailboxEmails[email].sender} </span> 
     <span class="subject">Subject: ${mailboxEmails[email].subject}</span> 
     <span class="timestamp">${mailboxEmails[email].timestamp}</span>
-    </span><button class="buttonEmail" id="buttonEmail${mailboxEmails[email].id}">Archive</button></div>`;
+    </span><button class="buttonEmail" onclick="archiveEmail(${mailboxEmails[email].id})">Archive</button></div>`;
     emailIdCompiler.push(mailboxEmails[email].id);
     emailStatusCompiler.push(mailboxEmails[email].read)
   }
