@@ -24,13 +24,31 @@ function compose_email() {
 
 async function load_email(email) {
 
+  /* // Update read status
+  try {
+    const response = await fetch(`emails/${ email }`), {
+      method: 'PUT',
+      body: JSON.stringify ({
+        read: true
+      })
+    }
+  } catch (error) {
+    console.log(error);
+  }*/
+
   document.querySelector('#emails-view').innerHTML = `<h3>Email</h3>`;
-  
+
   //Request email details
   try {
-    const response = await fetch(`emails/${ email }`);
-    const emailDetail = await response.json();
-    console.log(emailDetail);
+    const response = await fetch(`emails/${ email }`, {
+      method: 'PUT',
+      body: JSON.stringify ({
+        read: true
+      })
+    })
+    console.log(response)
+    const getResponse = await fetch(`emails/${ email }`);
+    const emailDetail = await getResponse.json();
     document.getElementById('emails-view').innerHTML +=  `<div id=readEmailInfo>
     <p><b>From:</b> ${emailDetail.sender}</p>
     <p><b>To:</b> ${emailDetail.recipients}</p>
@@ -82,11 +100,11 @@ async function load_mailbox(mailbox) {
 
   for (let email in mailboxEmails) {
     console.log(mailboxEmails[email].subject);
-    document.getElementById('emails-view').innerHTML +=  `<div id=email${mailboxEmails[email].id} class='mailboxEmails'>
+    document.getElementById('emails-view').innerHTML +=  `<div class=emailContainer><span id="email${mailboxEmails[email].id}" class='mailboxEmails'>
     <span class="from">From: ${mailboxEmails[email].sender} </span> 
     <span class="subject">Subject: ${mailboxEmails[email].subject}</span> 
     <span class="timestamp">${mailboxEmails[email].timestamp}</span>
-    </div>`;
+    </span><button class="buttonEmail" id="buttonEmail${mailboxEmails[email].id}">Archive</button></div>`;
     emailIdCompiler.push(mailboxEmails[email].id);
     emailStatusCompiler.push(mailboxEmails[email].read)
   }
