@@ -4,57 +4,68 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
-  document.querySelector('#compose').addEventListener('click', compose_email);
+  document.querySelector('#compose').addEventListener('click', () => { compose_email('none', 'none', 'none'); });
 
   // By default, load the inbox
   load_mailbox('inbox');
 });
 
-async function archiveEmail(email) {
+// Update archive status
+async function archiveEmail(email, archived) {
   document.getElementById(`email${email}`).parentElement.setAttribute('hidden', 'hidden')
-  try {
-    const response = await fetch(`emails/${ email }`, {
-      method: 'PUT',
-      body: JSON.stringify ({
-      archived: true
+  if (archived) {
+    try {
+      const response = await fetch(`emails/${ email }`, {
+        method: 'PUT',
+        body: JSON.stringify ({
+        archived: false
+        })
       })
-    })
-    console.log(response);
-  } catch (error) {
-    console.log(error);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    try {
+      const response = await fetch(`emails/${ email }`, {
+        method: 'PUT',
+        body: JSON.stringify ({
+        archived: true
+        })
+      })
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
   }
 };
 
-
-function compose_email() {
+function compose_email(recipient, subject, body) {
 
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
 
-  // Clear out composition fields
-  document.querySelector('#compose-recipients').value = '';
-  document.querySelector('#compose-subject').value = '';
-  document.querySelector('#compose-body').value = '';
+  if (recipient === 'none'){
+    // Clear out composition fields
+    document.querySelector('#compose-recipients').value = '';
+    document.querySelector('#compose-subject').value = '';
+    document.querySelector('#compose-body').value = '';
+  } else {
+    // Format subject to have Re: only once
+    subject = subject.replace(/Re:/g, "")
+    // Update composition fields for reply
+    document.querySelector('#compose-recipients').value = recipient;
+    document.querySelector('#compose-subject').value = `Re: ${subject}`;
+    document.querySelector('#compose-body').value = body;
+  }
 }
 
-async function load_email(email) {
-
-  /* // Update read status
-  try {
-    const response = await fetch(`emails/${ email }`), {
-      method: 'PUT',
-      body: JSON.stringify ({
-        read: true
-      })
-    }
-  } catch (error) {
-    console.log(error);
-  }*/
+async function load_email(email, type) {
 
   document.querySelector('#emails-view').innerHTML = `<h3>Email</h3>`;
 
-  //Request email details
+  // Update email's read status
   try {
     const response = await fetch(`emails/${ email }`, {
       method: 'PUT',
@@ -63,16 +74,40 @@ async function load_email(email) {
       })
     })
     console.log(response)
+
+    // Request email details
     const getResponse = await fetch(`emails/${ email }`);
     const emailDetail = await getResponse.json();
-    document.getElementById('emails-view').innerHTML +=  `<div id=readEmailInfo>
-    <p><b>From:</b> ${emailDetail.sender}</p>
-    <p><b>To:</b> ${emailDetail.recipients}</p>
-    <p><b>Subject:</b> ${emailDetail.subject}</p> 
-    <p><b>Timestamp:</b> ${emailDetail.timestamp}</p>
-    <hr>
-    <p> ${ emailDetail.body } </p>
-    </div>`;
+
+    // Format variables to be used as function parameters
+    const recipient = emailDetail.sender.replace(/'/g, "\\&#39;");
+    const subject = emailDetail.subject.replace(/'/g, "\\&#39;");
+    const body = emailDetail.body.replace(/'/g, "\\&#39;");
+    const timestamp = emailDetail.timestamp.replace(/'/g, "\\&#39;");
+
+    // Render email details. Read (type) emails don't render reply button
+    if (type === 'other') {
+      document.getElementById('emails-view').innerHTML +=  `<div id=readEmailInfo>
+      <p><b>From:</b> ${emailDetail.sender}</p>
+      <p><b>To:</b> ${emailDetail.recipients}</p>
+      <p><b>Subject:</b> ${emailDetail.subject}</p> 
+      <p><b>Timestamp:</b> ${emailDetail.timestamp}</p>
+      <hr>
+      <p style="line-height: normal;"> ${ emailDetail.body } </p>
+      </div>
+      <button class="replyButton btn btn-primary" 
+      onclick="compose_email('${recipient}', '${subject}', 'On ${ timestamp }, ${ recipient } wrote: ${ body }')">Reply</button>`;
+    } else {
+      document.getElementById('emails-view').innerHTML +=  `<div id=readEmailInfo>
+      <p><b>From:</b> ${emailDetail.sender}</p>
+      <p><b>To:</b> ${emailDetail.recipients}</p>
+      <p><b>Subject:</b> ${emailDetail.subject}</p> 
+      <p><b>Timestamp:</b> ${emailDetail.timestamp}</p>
+      <hr>
+      <p style="line-height: normal;"> ${ emailDetail.body } </p>
+      </div>`
+    }
+    
   }catch (error) {
     console.log(error);
   }
@@ -98,42 +133,49 @@ async function load_mailbox(mailbox) {
     }
   }
    
-  // Populate inbox
+  // Variable for populating mailbox
   const mailboxEmails = await getEmails(mailbox);
   console.log(mailboxEmails)
-/*   mailboxEmails.forEach(email => {
-    p = document.createElement('p');
-    document.getElementById('emails-view').appendChild(p); 
-    att = document.createAttribute('class');
-    att.value = 'mailboxEmails';
-    p.setAttributeNode(att);
-    p.innerHTML = mailboxEmails[email].subject
-    
-  }); */
 
+  // Compiler arrays for event handler
   let emailIdCompiler = []
   let emailStatusCompiler = []
 
-  for (let email in mailboxEmails) {
-    console.log(mailboxEmails[email].subject);
-    console.log(mailboxEmails[email].archived)
-    document.getElementById('emails-view').innerHTML +=  `<div class=emailContainer><span id="email${mailboxEmails[email].id}" class='mailboxEmails'>
-    <span class="from">From: ${mailboxEmails[email].sender} </span> 
-    <span class="subject">Subject: ${mailboxEmails[email].subject}</span> 
-    <span class="timestamp">${mailboxEmails[email].timestamp}</span>
-    </span><button class="buttonEmail" onclick="archiveEmail(${mailboxEmails[email].id})">Archive</button></div>`;
-    emailIdCompiler.push(mailboxEmails[email].id);
-    emailStatusCompiler.push(mailboxEmails[email].read)
+  // Rendering loop for Sent mailbox and others
+  if (mailbox === 'sent') {
+    for (let email in mailboxEmails) {
+      console.log(mailboxEmails[email].subject);
+      console.log(mailboxEmails[email].archived)
+      document.getElementById('emails-view').innerHTML +=  `<div class="emailContainer"><span id="email${mailboxEmails[email].id}" class='mailboxEmails'>
+      <span class="from">From: ${mailboxEmails[email].sender} </span> 
+      <span class="subject">Subject: ${mailboxEmails[email].subject}</span> 
+      <span class="timestamp">${mailboxEmails[email].timestamp}</span>
+      </span></div>`;
+      emailIdCompiler.push([mailboxEmails[email].id, 'sent']);
+      emailStatusCompiler.push(mailboxEmails[email].read)
+    }
+  } else {
+    for (let email in mailboxEmails) {
+      let archivedStatus = mailboxEmails[email].archived
+      archivedStatus ? archivedStatus = 'Unarchive' : archivedStatus = 'Archive'
+      document.getElementById('emails-view').innerHTML +=  `<div class=emailContainer><span id="email${mailboxEmails[email].id}" class='mailboxEmails'>
+      <span class="from">From: ${mailboxEmails[email].sender} </span> 
+      <span class="subject">Subject: ${mailboxEmails[email].subject}</span> 
+      <span class="timestamp">${mailboxEmails[email].timestamp}</span>
+      </span><button class="buttonEmail btn btn-light" onclick="archiveEmail(${mailboxEmails[email].id}, ${mailboxEmails[email].archived})">${ archivedStatus }</button></div>`;
+      emailIdCompiler.push([mailboxEmails[email].id, 'other']);
+      emailStatusCompiler.push(mailboxEmails[email].read)
+    }
   }
 
   // Event handler for email clicks
   for (let i = 0; i < emailIdCompiler.length; i++) {
-    document.getElementById(`email${emailIdCompiler[i]}`).addEventListener("click", () => {
-      console.log(`you just clicked on email${emailIdCompiler[i]} !!`);
-      load_email(emailIdCompiler[i]);
+    document.getElementById(`email${emailIdCompiler[i][0]}`).addEventListener("click", () => {
+      console.log(`You just clicked on email${emailIdCompiler[i][0]} !!`);
+      load_email(emailIdCompiler[i][0], emailIdCompiler[i][1]);
     });
     if (emailStatusCompiler[i] === true) {
-      document.getElementById(`email${emailIdCompiler[i]}`).classList.add("readStatus");
+      document.getElementById(`email${emailIdCompiler[i][0]}`).classList.add("readStatus");
     }
   }
 }

@@ -4,11 +4,8 @@ html {
 
 textarea {
     min-height: 400px;
+    line-height:normal !important;
 }
-
-/* #emails-view {
-    background-color: bisque;
-} */
 
 .mailboxEmails {
     display: flex;
@@ -71,19 +68,18 @@ textarea {
 
 .buttonEmail {
     display: inline-block;
-    border: 1px solid black;
     border-radius: 0.3rem;
     padding: 0.1rem;
-    margin-bottom: 0.1rem;
-    background-color: rgba(159, 163, 163, 0.60);
-}
-
-.buttonEmail:hover {
-    background-color: rgba(159, 163, 163, 0.80);
+    margin: 0.1rem;
 }
 
 .buttonEmail:active {
     border: none;
+}
+
+.replyButton {
+    float: right;
+    margin-right: 20%;
 }
 
 /* @keyframes remove {
