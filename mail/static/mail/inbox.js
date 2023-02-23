@@ -12,7 +12,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Update archive status
 async function archiveEmail(email, archived) {
-  document.getElementById(`email${email}`).parentElement.setAttribute('hidden', 'hidden')
+  
+  document.getElementById(`email${email}`).parentElement.style.animationPlayState = 'running';
+  document.getElementById(`email${email}`).parentElement.addEventListener('animationend', () => {
+    document.getElementById(`email${email}`).parentElement.setAttribute('hidden', 'hidden');
+  });
+  
   if (archived) {
     try {
       const response = await fetch(`emails/${ email }`, {

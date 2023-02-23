@@ -64,6 +64,11 @@ textarea {
 .emailContainer {
     display:flex;
     justify-content: space-between;
+    min-height: 2.5rem;
+    animation-name: removeMail;
+    animation-duration: 1.5s;
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
 }
 
 .buttonEmail {
@@ -82,11 +87,11 @@ textarea {
     margin-right: 20%;
 }
 
-/* @keyframes remove {
-    from {
-
+@keyframes removeMail {
+    0% {
+        opacity: 1;
     }
-    to {
-
+    100% {
+        opacity: 0;
     }
-} */
+}
