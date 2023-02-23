@@ -53,7 +53,7 @@ function compose_email(recipient, subject, body) {
     document.querySelector('#compose-body').value = '';
   } else {
     // Format subject to have Re: only once
-    subject = subject.replace(/Re:/g, "")
+    subject = subject.replace(/^Re:/, "")
     // Update composition fields for reply
     document.querySelector('#compose-recipients').value = recipient;
     document.querySelector('#compose-subject').value = `Re: ${subject}`;
@@ -82,9 +82,11 @@ async function load_email(email, type) {
     // Format variables to be used as function parameters
     const recipient = emailDetail.sender.replace(/'/g, "\\&#39;");
     const subject = emailDetail.subject.replace(/'/g, "\\&#39;");
-    const body = emailDetail.body.replace(/'/g, "\\&#39;");
     const timestamp = emailDetail.timestamp.replace(/'/g, "\\&#39;");
-
+    let body = emailDetail.body.replace(/'/g, "\\&#39;");
+    // Reformat body to avoid found bug when multiple replies occurred
+    body = body.split('\n').join(' ')
+    
     // Render email details. Read (type) emails don't render reply button
     if (type === 'other') {
       document.getElementById('emails-view').innerHTML +=  `<div id=readEmailInfo>
