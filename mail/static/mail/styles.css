@@ -13,6 +13,7 @@ textarea {
     margin: 3px;
     padding: 0;
     border-bottom: 1px solid rgba(128, 128, 128, 0.45);
+    border-radius: 0.4rem;
     text-align: center;
     background-color: rgba(255, 228, 196, 0.45);
     cursor: pointer;

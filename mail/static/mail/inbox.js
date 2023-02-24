@@ -58,7 +58,7 @@ function compose_email(recipient, subject, body) {
     document.querySelector('#compose-body').value = '';
   } else {
     // Format subject to have Re: only once
-    subject = subject.replace(/^Re:/, "")
+    subject = subject.replace(/^Re: /, "")
     // Update composition fields for reply
     document.querySelector('#compose-recipients').value = recipient;
     document.querySelector('#compose-subject').value = `Re: ${subject}`;
@@ -90,7 +90,7 @@ async function load_email(email, type) {
     const timestamp = emailDetail.timestamp.replace(/'/g, "\\&#39;");
     let body = emailDetail.body.replace(/'/g, "\\&#39;");
     // Reformat body to avoid found bug when multiple replies occurred
-    body = body.split('\n').join(' ')
+    body = body.split('\n').join('<br>').split('<br>').join(' ')
     
     // Render email details. Read (type) emails don't render reply button
     if (type === 'other') {
@@ -142,7 +142,6 @@ async function load_mailbox(mailbox) {
    
   // Variable for populating mailbox
   const mailboxEmails = await getEmails(mailbox);
-  console.log(mailboxEmails)
 
   // Compiler arrays for event handler
   let emailIdCompiler = []
@@ -151,8 +150,6 @@ async function load_mailbox(mailbox) {
   // Rendering loop for Sent mailbox and others
   if (mailbox === 'sent') {
     for (let email in mailboxEmails) {
-      console.log(mailboxEmails[email].subject);
-      console.log(mailboxEmails[email].archived)
       document.getElementById('emails-view').innerHTML +=  `<div class="emailContainer"><span id="email${mailboxEmails[email].id}" class='mailboxEmails'>
       <span class="from">From: ${mailboxEmails[email].sender} </span> 
       <span class="subject">Subject: ${mailboxEmails[email].subject}</span> 
@@ -197,7 +194,9 @@ composeForm.addEventListener('submit', async event => {
   // Form content variables
   const composeRecipients = document.getElementById('compose-recipients').value;
   const composeSubject = document.getElementById('compose-subject').value;
-  const composeBody = document.getElementById('compose-body').value;
+  let composeBody = document.getElementById('compose-body').value;
+  // Format to preserve new lines while rendering
+  composeBody = composeBody.replace(/\n/g, "<br>")
   try {
     const response = await fetch('/emails', {
       method: 'POST',
